@@ -6,7 +6,7 @@
     <title>詩句節奏記憶訓練器</title>
     <style>
         :root {
-            --bg-color: #f8f9fa;
+            --bg-color: #f4f7f6;
             --card-bg: #ffffff;
             --text-color: #2c3e50;
             --accent-color: #3498db;
@@ -20,88 +20,86 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding: 30px 15px;
             margin: 0;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 850px;
             width: 100%;
         }
 
         h1 {
             color: var(--text-color);
             text-align: center;
-            margin-bottom: 40px;
-            font-size: 2em;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            letter-spacing: 2px;
         }
 
         .poem-group {
-            margin-bottom: 50px;
+            margin-bottom: 45px;
             animation: fadeIn 0.8s ease;
         }
 
         .poem-title {
-            font-size: 1.5em;
-            color: #7f8c8d;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
+            font-size: 1.4em;
+            color: #5d6d7e;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
             margin-bottom: 20px;
             display: block;
+            font-weight: bold;
         }
 
-        /* Grid for the sentence cards */
         .sentence-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Individual Sentence Card */
         .sentence-card {
             background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px 25px;
-            min-width: 80px;
-            min-height: 50px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 18px;
+            min-width: 40px;
+            min-height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             position: relative;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
             flex: 0 1 auto;
         }
 
         .sentence-card:hover {
             border-color: var(--accent-color);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
         }
 
-        /* The text inside: Start as transparent (Blank) */
         .sentence-text {
             color: transparent; 
             user-select: none;
-            font-size: 1.2em;
-            transition: color 0.4s ease;
+            font-size: 1.15em;
+            transition: color 0.3s ease;
             font-weight: 500;
+            line-height: 1.4;
         }
 
-        /* revealed state: show text */
         .sentence-card.revealed .sentence-text {
             color: var(--text-color);
         }
 
-        /* Visual hint '?' when blank */
         .sentence-card::before {
             content: "?";
             position: absolute;
             color: var(--empty-color);
-            font-size: 1.2em;
+            font-size: 1.1em;
             transition: opacity 0.3s ease;
         }
 
@@ -110,8 +108,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .sentence-text { font-size: 1em; }
+            .sentence-card { padding: 10px 15px; }
         }
     </style>
 </head>
@@ -123,7 +126,6 @@
     </div>
 
     <script>
-        // 1. Data source
         const poemsData = [
             {
                 title: "浪淘沙",
@@ -131,35 +133,31 @@
             },
             {
                 title: "破陣子",
-                content: "醉裡挑燈看劍，夢回吹角連營。八百里分麾下炙，五十絃翻塞外聲，沙場秋點兵。"
+                content: "醉裡挑燈看劍，夢回吹角連營。八百里分麾下炙，五十絃翻塞外聲，沙場秋點兵。馬作的盧飛快，弓如霹靂弦驚。了卻君王天下事，贏得生前身後名，可憐白髮生。"
             },
             {
                 title: "念奴嬌",
-                content: "大江東去，浪淘盡、千古風流人物。故壘西邊，人道是：三國周郎赤壁。亂石崩雲，驚濤裂岸，捲起千堆雪。江山如畫，一時多少豪傑。遙想公瑾當年，小喬初嫁了，雄姿英發，羽扇綸巾，談笑間，檦櫓灰飛煙滅。人生如夢，一尊還酹江月。"
+                content: "大江東去，浪淘盡、千古風流人物。故壘西邊，人道是：三國周郎赤壁。亂石崩雲，驚濤裂岸，捲起千堆雪。江山如畫，一時多少豪傑。遙想公瑾當年，小喬初嫁了，雄姿英發，羽扇綸巾，談笑間，檦櫓灰飛煙滅。故國神遊，多情應笑我，早生華髮。人生如夢，一尊還酹江月。"
             }
         ];
 
-        // 2. Initialization function
         function initApp() {
             const app = document.getElementById('app');
             
             poemsData.forEach(poem => {
-                // Create Group Container
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'poem-group';
 
-                // Create Title
                 const titleSpan = document.createElement('span');
                 titleSpan.className = 'poem-title';
                 titleSpan.textContent = poem.title;
                 groupDiv.appendChild(titleSpan);
 
-                // Create Grid Container
                 const gridDiv = document.createElement('div');
                 gridDiv.className = 'sentence-grid';
 
-                // Split content by commas (Chinese and English)
-                const sentences = poem.content.split(/[，,]/).filter(s => s.trim() !== "");
+                // Split by Chinese comma, English comma, and new lines
+                const sentences = poem.content.split(/[，,\n\r]+/).filter(s => s.trim() !== "");
 
                 sentences.forEach(sentence => {
                     const card = createSentenceCard(sentence);
@@ -171,7 +169,6 @@
             });
         }
 
-        // 3. Function to create a single card
         function createSentenceCard(text) {
             const card = document.createElement('div');
             card.className = 'sentence-card';
@@ -182,7 +179,6 @@
             
             card.appendChild(textSpan);
 
-            // Click to reveal/hide
             card.addEventListener('click', function() {
                 this.classList.toggle('revealed');
             });
@@ -190,7 +186,6 @@
             return card;
         }
 
-        // Run when window loads
         window.onload = initApp;
     </script>
 </body>
