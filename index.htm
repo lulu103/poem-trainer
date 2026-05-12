@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>詩句節奏記憶訓練器</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --accent-color: #3498db;
+            --border-color: #dcdde1;
+            --empty-color: #bdc3c7;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft JhengHei', serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+
+        .poem-group {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .poem-title {
+            font-size: 1.5em;
+            color: #7f8c8d;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Grid for the sentence cards */
+        .sentence-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Individual Sentence Card */
+        .sentence-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px 25px;
+            min-width: 80px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex: 0 1 auto;
+        }
+
+        .sentence-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        /* The text inside: Start as transparent (Blank) */
+        .sentence-text {
+            color: transparent; 
+            user-select: none;
+            font-size: 1.2em;
+            transition: color 0.4s ease;
+            font-weight: 500;
+        }
+
+        /* revealed state: show text */
+        .sentence-card.revealed .sentence-text {
+            color: var(--text-color);
+        }
+
+        /* Visual hint '?' when blank */
+        .sentence-card::before {
+            content: "?";
+            position: absolute;
+            color: var(--empty-color);
+            font-size: 1.2em;
+            transition: opacity 0.3s ease;
+        }
+
+        .sentence-card.revealed::before {
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>💡 詩句節奏訓練器</h1>
+        <div id="app"></div>
+    </div>
+
+    <script>
+        // 1. Data source
+        const poemsData = [
+            {
+                title: "浪淘沙",
+                content: "簾外雨潺潺，春意闌珊，羅衾不耐五更寒。夢裡不知身是客，一晌貪歡。獨自莫凭欄，無限江山，別時容易見時難。流水落花春去也，天上人間。"
+            },
+            {
+                title: "破陣子",
+                content: "醉裡挑燈看劍，夢回吹角連營。八百里分麾下炙，五十絃翻塞外聲，沙場秋點兵。"
+            },
+            {
+                title: "念奴嬌",
+                content: "大江東去，浪淘盡、千古風流人物。故壘西邊，人道是：三國周郎赤壁。亂石崩雲，驚濤裂岸，捲起千堆雪。江山如畫，一時多少豪傑。遙想公瑾當年，小喬初嫁了，雄姿英發，羽扇綸巾，談笑間，檦櫓灰飛煙滅。人生如夢，一尊還酹江月。"
+            }
+        ];
+
+        // 2. Initialization function
+        function initApp() {
+            const app = document.getElementById('app');
+            
+            poemsData.forEach(poem => {
+                // Create Group Container
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'poem-group';
+
+                // Create Title
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'poem-title';
+                titleSpan.textContent = poem.title;
+                groupDiv.appendChild(titleSpan);
+
+                // Create Grid Container
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'sentence-grid';
+
+                // Split content by commas (Chinese and English)
+                const sentences = poem.content.split(/[，,]/).filter(s => s.trim() !== "");
+
+                sentences.forEach(sentence => {
+                    const card = createSentenceCard(sentence);
+                    gridDiv.appendChild(card);
+                });
+
+                groupDiv.appendChild(gridDiv);
+                app.appendChild(groupDiv);
+            });
+        }
+
+        // 3. Function to create a single card
+        function createSentenceCard(text) {
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'sentence-text';
+            textSpan.textContent = text;
+            
+            card.appendChild(textSpan);
+
+            // Click to reveal/hide
+            card.addEventListener('click', function() {
+                this.classList.toggle('revealed');
+            });
+
+            return card;
+        }
+
+        // Run when window loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>
